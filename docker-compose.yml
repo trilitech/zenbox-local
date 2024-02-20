@@ -19,7 +19,7 @@ services:
       - ./data:/data/db
 
   backend:
-    image: localhost:5001/zenbox-backend
+    image: ${DOCKER_REGISTRY}/zenbox-backend
     depends_on:
       - mongo
       - llamacpp
@@ -29,7 +29,7 @@ services:
       - ./backend/logs:/app/logs
 
   backend-api:
-    image: localhost:5001/zenbox-backend-api
+    image: ${DOCKER_REGISTRY}/zenbox-backend-api
     depends_on:
       - mongo
     env_file:
@@ -38,7 +38,7 @@ services:
       - ./api/logs:/app/logs
 
   nextjs-app:
-    image: localhost:5001/zenbox-nextjs-app
+    image: ${DOCKER_REGISTRY}/zenbox-nextjs-app
     depends_on:
       - mongo
     env_file:
