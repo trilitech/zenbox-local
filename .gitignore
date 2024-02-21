@@ -1,8 +1,18 @@
 .env
+
+# LLM local model(s) directory
 /models
+
+# MongoDB data directory
 data
+
+# Logs
 api/logs
 backend/logs
+
+# HTTPS Certificate and Key
+localhost.crt
+localhost.key
 
 # Created by https://www.toptal.com/developers/gitignore/api/macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos
