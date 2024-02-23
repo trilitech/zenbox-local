@@ -53,6 +53,26 @@ if [ ! -f ".env" ]; then
     echo "Environment setup complete."
 fi
 
+# Function to validate base64 string format
+validate_base64_format() {
+    local value=$1
+    # Allow for base64 characters, including +, /, and = for padding.
+    local regex="^[A-Za-z0-9+/]+={0,2}$"
+    if ! [[ $value =~ $regex ]]; then
+        echo "The value does not match the expected base64 format."
+        exit 1
+    fi
+}
+
+# Validate AES_256_KEY and NEXTAUTH_SECRET formats
+aes_256_key=$(grep "AES_256_KEY" .env | cut -d'"' -f2)
+validate_base64_format "$aes_256_key"
+
+nextauth_secret=$(grep "NEXTAUTH_SECRET" .env | cut -d'"' -f2)
+validate_base64_format "$nextauth_secret"
+
+echo ".env values for AES_256_KEY and NEXTAUTH_SECRET are correctly formatted."
+
 # Check if SSL certificates exist, if not, generate them
 if [ ! -f "localhost.crt" ] || [ ! -f "localhost.key" ]; then
     echo "SSL certificates not found, generating..."
