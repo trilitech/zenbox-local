@@ -9,6 +9,7 @@ data
 # Logs
 api/logs
 backend/logs
+docker_compose.log
 
 # HTTPS Certificate and Key
 localhost.crt
