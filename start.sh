@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Ensure the script exits on any error
+set -e
+
+# Check if running on macOS
+if [[ "$(uname)" != "Darwin" ]]; then
+    echo "This script is intended to run on macOS only."
+    exit 1
+fi
+
 # Function to check and install openssl if necessary
 check_and_install_openssl() {
     # Check if openssl is available
