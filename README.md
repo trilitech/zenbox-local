@@ -6,7 +6,7 @@
 
 1. Open Docker Desktop and compelte the setup
 
-1. Go to Settings -> Docker Engine -> add `"insecure-registries: ["<IP address of the local registry>:5001"]` to the JSON. This is to allow the local registry to be used.
+1. Go to Settings -> Docker Engine -> add `"insecure-registries": ["<IP address of the local registry>:5001"]` to the JSON. This is to allow the local registry to be used.
 
 1. Run start script
 
