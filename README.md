@@ -8,6 +8,8 @@
 
 1. Go to Settings -> Docker Engine -> add `"insecure-registries": ["<IP address of the local registry>:5001"]` to the JSON. This is to allow the local registry to be used.
 
+1. Clone this repository and cd into it
+
 1. Run start script
 
 ```sh
