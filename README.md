@@ -28,3 +28,7 @@ Despite this, your data remains secure. It never leaves your computer. We use HT
 ### (Optional) Viewing stored data
 
 You can install [MongoDB Compass](https://www.mongodb.com/products/tools/compass) to have a GUI access to the DB. You can find the credentials in `.env` file. We map the port `27017` to the host machine, so when you open MongoDB Compass, you can use `mongodb://zenbox_mongo_user:password_here@localhost:27017/` as the URI.
+
+### If running Zenbox makes your system slower
+
+To lower Zenbox's resource usage, navigate to Docker Desktop -> Settings -> Resources and decrease the CPU/Memory/Swap allocations. This will extend email processing times but may be a suitable trade-off for you.
