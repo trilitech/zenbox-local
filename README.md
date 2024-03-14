@@ -12,32 +12,19 @@
 
 1. Run start script
 
-```sh
-# Make the script executable
-chmod +x start.sh
+    ```sh
+    # Make the script executable
+    chmod +x start.sh
+    
+    # Run the script
+    ./start.sh
+    ```
 
-# Run the script
-./start.sh
-```
+1. Now you can access Zenbox at https://localhost. Please ignore the certificate warning and proceed to the website. <br/><br/>
+<b>Further Details</b>: When visiting a website, your browser expects a security certificate that has been verified by a trusted authority. This helps ensure the site is secure. However, because we're setting up the website to run directly on your computer, we use a local process to generate these certificates. These aren't recognized by standard authorities, which is why you're seeing the warning. To learn more about how these certificates are created, you can refer to the start-up script. <br/>
+Despite this, your data remains secure. It never leaves your computer. We use HTTPS encryption, which means even if someone could listen in on the data being sent to and from your computer (via loopback traffic), they would only see encrypted information, keeping your data safe.
 
-### Viewing stored data
+
+### (Optional) Viewing stored data
 
 You can install [MongoDB Compass](https://www.mongodb.com/products/tools/compass) to have a GUI access to the DB. You can find the credentials in `.env` file. We map the port `27017` to the host machine, so when you open MongoDB Compass, you can use `mongodb://zenbox_mongo_user:password_here@localhost:27017/` as the URI.
-
-
-## Someone needs to start a Docker Registry locally
-
-- Start the registry: `docker run -d -p 5001:5000 --restart=always --name registry registry:latest` (refer https://www.docker.com/blog/how-to-use-your-own-registry-2/)
-- Tag images and push them to the local registry
-
-  ```sh
-  docker tag zenbox-backend localhost:5001/zenbox-backend
-  docker tag zenbox-nextjs-app localhost:5001/zenbox-nextjs-app
-  docker tag zenbox-api localhost:5001/zenbox-backend-api
-  ```
-
-  ```sh
-  docker push localhost:5001/zenbox-backend
-  docker push localhost:5001/zenbox-nextjs-app
-  docker push localhost:5001/zenbox-backend-api
-  ```
