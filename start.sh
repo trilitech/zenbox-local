@@ -26,33 +26,6 @@ check_and_install_openssl() {
     fi
 }
 
-# Check if .env file exists, if not, copy from .env.example
-if [ ! -f ".env" ]; then
-    cp .env.example .env
-    echo ".env file created from .env.example."
-
-    # Ask for Docker Registry address and update .env
-    read -p "Enter the Docker Registry address: " docker_registry
-    sed -i '' "s|DOCKER_REGISTRY=.*|DOCKER_REGISTRY=\"$docker_registry\"|g" .env
-
-    # Call function to check and install OpenSSL if necessary
-    check_and_install_openssl
-
-    # Generate AES_256_KEY and set in .env
-    aes_256_key=$(openssl rand -base64 32)
-    sed -i '' "s|AES_256_KEY=.*|AES_256_KEY=\"$aes_256_key\"|g" .env
-
-    # Generate NEXTAUTH_SECRET and set in .env
-    nextauth_secret=$(openssl rand -base64 32)
-    sed -i '' "s|NEXTAUTH_SECRET=.*|NEXTAUTH_SECRET=\"$nextauth_secret\"|g" .env
-
-    # Generate a random MongoDB password
-    mongodb_password=$(openssl rand -base64 32 | tr -d /=+ | cut -c1-20)
-    sed -i '' "s|MONGODB_PASSWORD=.*|MONGODB_PASSWORD=\"$mongodb_password\"|g" .env
-
-    echo "Environment setup complete."
-fi
-
 # Function to validate base64 string format
 validate_base64_format() {
     local value=$1
@@ -65,28 +38,70 @@ validate_base64_format() {
 }
 
 # Validate AES_256_KEY and NEXTAUTH_SECRET formats
-aes_256_key=$(grep "AES_256_KEY" .env | cut -d'"' -f2)
-validate_base64_format "$aes_256_key"
+validate_keys() {
+    aes_256_key=$(grep "AES_256_KEY" .env | cut -d'"' -f2)
+    validate_base64_format "$aes_256_key"
 
-nextauth_secret=$(grep "NEXTAUTH_SECRET" .env | cut -d'"' -f2)
-validate_base64_format "$nextauth_secret"
+    nextauth_secret=$(grep "NEXTAUTH_SECRET" .env | cut -d'"' -f2)
+    validate_base64_format "$nextauth_secret"
 
-echo ".env values for AES_256_KEY and NEXTAUTH_SECRET are correctly formatted."
+    echo ".env values for AES_256_KEY and NEXTAUTH_SECRET are correctly formatted."
+}
 
-# Check if SSL certificates exist, if not, generate them
-if [ ! -f "localhost.crt" ] || [ ! -f "localhost.key" ]; then
-    echo "SSL certificates not found, generating..."
+generate_ssl_certificates() {
+    # Check if SSL certificates exist, if not, generate them
+    if [ ! -f "localhost.crt" ] || [ ! -f "localhost.key" ]; then
+        echo "SSL certificates not found, generating..."
 
-    # Call function to check and install OpenSSL if necessary
+        # Command from https://letsencrypt.org/docs/certificates-for-localhost/
+        openssl req -x509 -out localhost.crt -keyout localhost.key \
+        -newkey rsa:2048 -nodes -sha256 \
+        -subj '/CN=localhost' -extensions EXT -config <( \
+        printf "[dn]\nCN=localhost\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:localhost\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
+        echo "SSL certificates generated."
+    fi
+}
+
+# Check if .env file exists, if not, create and populate it
+if [ ! -f ".env" ]; then
+    touch .env
+    echo "MODE=\"local\"" >> .env
+
+    read -p "Enter the Docker Registry address along with port number: " docker_registry
+    echo "DOCKER_REGISTRY=\"$docker_registry\"" >> .env
+
     check_and_install_openssl
 
-    # Command from https://letsencrypt.org/docs/certificates-for-localhost/
-    openssl req -x509 -out localhost.crt -keyout localhost.key \
-      -newkey rsa:2048 -nodes -sha256 \
-      -subj '/CN=localhost' -extensions EXT -config <( \
-       printf "[dn]\nCN=localhost\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:localhost\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
-    echo "SSL certificates generated."
+    aes_256_key=$(openssl rand -base64 32)
+    echo "AES_256_KEY=\"$aes_256_key\"" >> .env
+
+    nextauth_secret=$(openssl rand -base64 32)
+    echo "NEXTAUTH_SECRET=\"$nextauth_secret\"" >> .env
+
+    echo "MONGODB_USERNAME=\"zenbox_mongo_user\"" >> .env
+    mongodb_password=$(openssl rand -base64 32 | tr -d /=+ | cut -c1-20)
+    echo "MONGODB_PASSWORD=\"$mongodb_password\"" >> .env
+    echo "MONGODB_ADDRESS=mongo" >> .env
+    echo "MONGODB_PORT=27017" >> .env
+    echo "MONGODB_URI=\"mongodb://\${MONGODB_USERNAME}:\${MONGODB_PASSWORD}@\${MONGODB_ADDRESS}:\${MONGODB_PORT}\"" >> .env
+    echo "MONGODB_DATABASE_NAME=\"zenbox\"" >> .env
+
+
+    echo "LLM_CHOICE=\"local\"" >> .env
+    echo "GMAIL_OAUTH_ENABLED=false" >> .env
+    echo "NEXTAUTH_URL=\"https://localhost\"" >> .env
+    echo "BACKEND_API_URL=\"http://api:8000\"" >> .env
+
+    echo "SSL_KEY_PATH=./localhost.key" >> .env
+    echo "SSL_CERT_PATH=./localhost.crt" >> .env
+
+    echo "Environment setup complete."
 fi
+
+# Validate AES_256_KEY and NEXTAUTH_SECRET formats
+validate_keys
+
+generate_ssl_certificates
 
 echo "Stopping and removing current containers"
 docker-compose down
@@ -99,3 +114,5 @@ docker-compose up -d
 
 echo "Redirecting docker-compose logs to docker_compose.log"
 docker-compose logs > docker_compose.log 2>&1
+
+open https://localhost
