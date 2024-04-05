@@ -67,7 +67,7 @@ check_and_generate_ssl_certificates() {
     fi
 }
 
-build_from_source=true
+build_from_source=false
 
 # Check if running on macOS
 if [[ "$(uname)" != "Darwin" ]]; then
