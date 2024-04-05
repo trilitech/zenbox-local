@@ -26,16 +26,16 @@ services:
     env_file:
       - ./.env
     volumes:
-      - ./backend/logs:/app/logs
+      - ./logs/backend:/app/logs
 
-  backend-api:
+  api:
     image: ${DOCKER_REGISTRY}/zenbox-backend-api
     depends_on:
       - mongo
     env_file:
       - ./.env
     volumes:
-      - ./api/logs:/app/logs
+      - ./logs/api:/app/logs
 
   nextjs-app:
     image: ${DOCKER_REGISTRY}/zenbox-nextjs-app
@@ -43,6 +43,8 @@ services:
       - mongo
     env_file:
       - ./.env
+    volumes:
+      - ./logs:/app/logs
 
   nginx:
     image: nginx:alpine

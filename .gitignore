@@ -1,4 +1,5 @@
 .env
+logs
 
 # LLM local model(s) directory
 /models
