@@ -6,11 +6,11 @@
   ```sh
   docker tag zenbox-backend localhost:5001/zenbox-backend
   docker tag zenbox-nextjs-app localhost:5001/zenbox-nextjs-app
-  docker tag zenbox-api localhost:5001/zenbox-backend-api
+  docker tag zenbox-api localhost:5001/zenbox-api
   ```
 
   ```sh
   docker push localhost:5001/zenbox-backend
   docker push localhost:5001/zenbox-nextjs-app
-  docker push localhost:5001/zenbox-backend-api
+  docker push localhost:5001/zenbox-api
   ```
