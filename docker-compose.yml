@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   llamacpp:
     image: joshxt/local-llm:cpu-f99ed54d76d3752a2af75979dd06f3ef52247a6d
